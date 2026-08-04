@@ -1,0 +1,72 @@
+# Build
+
+bin/
+obj/
+
+# Visual Studio
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+
+.idea/
+*.sln.iml
+
+# Logs
+
+*.log
+
+# ASP.NET Core
+
+appsettings.Development.json
+wwwroot/
+
+# User secrets
+
+**/secrets.json
+secrets.json
+
+# Entity Framework migrations temporárias
+
+*.db
+*.sqlite
+
+# PostgreSQL
+
+*.backup
+*.dump
+
+# NuGet
+
+*.nupkg
+packages/
+.nuget/
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# Environment variables
+
+.env
+.env.*
+
+# Test results
+
+TestResults/
+*.trx
+
+# Coverage
+
+coverage/
+*.coverage
+
+# Publish output
+
+publish/
+*.Publish.xml
