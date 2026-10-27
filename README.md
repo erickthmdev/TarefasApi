@@ -13,7 +13,7 @@ The application supports user authentication with JWT, user-specific task manage
 - **Npgsql** — PostgreSQL provider for Entity Framework Core
 - **JWT Bearer Authentication** — Token-based authentication
 - **ASP.NET Core Identity PasswordHasher** — Password hashing
-- **Swagger / OpenAPI** — Interactive API documentation
+- **Scalar / OpenAPI** — Interactive API documentation
 
 ## Features
 
