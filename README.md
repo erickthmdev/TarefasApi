@@ -1,127 +1,155 @@
-# 📋 TarefasApi
+# TarefasApi
 
-📋 **API REST para gestão de tarefas pessoais, desenvolvida em ASP.NET Core 9 utilizando Minimal APIs, Entity Framework Core e PostgreSQL. Implementa autenticação JWT, injeção de dependência e arquitetura organizada por feature. Gerencia usuários e tarefas classificadas por tipo (diárias e de longo prazo) através de endpoints RESTful protegidos por autorização baseada em token.**
+REST API for personal task management, built with C# and ASP.NET Core 9 using Minimal APIs, Entity Framework Core, and PostgreSQL.
 
----
+The application supports user authentication with JWT, user-specific task management, and task classification by type. It follows a feature-oriented endpoint organization and uses token-based authorization to protect resources.
 
-## 🚀 Tecnologias utilizadas
+## Technologies
 
-- **ASP.NET Core 9** — Minimal APIs (sem Controllers)
 - **C#**
-- **Entity Framework Core 9** — ORM
-- **PostgreSQL** — banco de dados relacional
-- **Npgsql.EntityFrameworkCore.PostgreSQL** — provider do EF Core para PostgreSQL
-- **JWT Bearer Authentication** — autenticação via token
-- **ASP.NET Core Identity (`PasswordHasher<T>`)** — hash seguro de senha
-- **Swagger / OpenAPI (Swashbuckle)** — documentação interativa da API
+- **ASP.NET Core 9** — Minimal APIs
+- **Entity Framework Core 9** — Object-relational mapping
+- **PostgreSQL** — Relational database
+- **Npgsql** — PostgreSQL provider for Entity Framework Core
+- **JWT Bearer Authentication** — Token-based authentication
+- **ASP.NET Core Identity PasswordHasher** — Password hashing
+- **Swagger / OpenAPI** — Interactive API documentation
 
----
+## Features
 
-## 🏗️ Arquitetura
+### Authentication and User Management
 
-Projeto estruturado com **Minimal APIs organizadas por feature**, sem uso de Controllers tradicionais. Os endpoints são definidos como extension methods (`Map*Endpoints`), agrupados por domínio e registrados no `Program.cs`.
+- User registration
+- User login with JWT authentication
+- Secure password hashing
+- Unique email validation
 
-```
+### Task Management
+
+- Create, retrieve, update, and delete tasks
+- Mark tasks as completed
+- Filter tasks by type
+- Associate tasks with their respective owners
+- Restrict access to tasks based on the authenticated user
+
+### Task Types
+
+- `Daily` — Daily tasks
+- `LongTerm` — Long-term tasks
+
+## Architecture
+
+The application uses Minimal APIs organized by feature, without traditional MVC controllers. Endpoint mappings are defined through extension methods and registered in `Program.cs`.
+
+```text
 TarefasApi/
-├── Program.cs                        # Composição da aplicação: DI, JWT, Swagger, pipeline HTTP
-├── Models/                           # Entidades do domínio
+├── Program.cs
+├── Models/
 │   ├── User.cs
 │   └── TaskItem.cs
 ├── Data/
-│   └── AppDbContext.cs               # Contexto do EF Core e configuração de relacionamentos
-├── DTOs/                             # Contratos de entrada/saída da API
+│   └── AppDbContext.cs
+├── DTOs/
 │   ├── AuthDtos.cs
 │   └── TaskDtos.cs
 ├── Services/
 │   ├── Interfaces/
 │   │   └── ITokenService.cs
 │   └── Implementation/
-│       └── TokenService.cs           # Geração de tokens JWT
+│       └── TokenService.cs
 ├── Extensions/
-│   └── ClaimsPrincipalExtensions.cs  # Helpers para extrair dados do usuário autenticado
+│   └── ClaimsPrincipalExtensions.cs
 └── Endpoints/
     ├── AuthEndpoints.cs
     └── TaskEndpoints.cs
 ```
 
----
+### Component Responsibilities
 
-## 🔑 Autenticação e segurança
+- **Models:** Represent users and tasks.
+- **Data:** Configures the database context and entity relationships.
+- **DTOs:** Define request and response data structures.
+- **Services:** Encapsulate supporting application services, including JWT generation.
+- **Extensions:** Provide reusable extension methods.
+- **Endpoints:** Define HTTP routes and handle API requests.
+- **Program.cs:** Configures dependency injection, authentication, Swagger, and the HTTP pipeline.
 
-- Login via **JWT**, com claims de `id`, `nome`, `email` e `role`
-- Senhas nunca armazenadas em texto puro — hash gerado pelo `PasswordHasher<T>` do ASP.NET Core Identity
-- Todos os endpoints de tarefas exigem token válido
-- Cada usuário só acessa, edita e remove as **próprias** tarefas (isolamento por `UserId`)
+## API Endpoints
 
----
+### Authentication
 
-## 📌 Endpoints
-
-### Autenticação
-
-| Método | Rota | Descrição |
+| Method | Endpoint | Description |
 |---|---|---|
-| POST | `/auth/register` | Cria um novo usuário |
-| POST | `/auth/login` | Autentica e retorna o token JWT |
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Authenticate a user and return a JWT |
 
-### Tarefas *(requer autenticação)*
+### Tasks
 
-| Método | Rota | Descrição |
+All task endpoints require a valid access token.
+
+| Method | Endpoint | Description |
 |---|---|---|
-| GET | `/tasks` | Lista todas as tarefas do usuário logado |
-| GET | `/tasks?type=Daily` | Lista apenas as tarefas do dia |
-| GET | `/tasks?type=LongTerm` | Lista apenas as tarefas de longo prazo |
-| GET | `/tasks/{id}` | Detalha uma tarefa específica |
-| POST | `/tasks` | Cria uma nova tarefa |
-| PUT | `/tasks/{id}` | Atualiza título, descrição e data |
-| PATCH | `/tasks/{id}/complete` | Marca a tarefa como concluída |
-| DELETE | `/tasks/{id}` | Remove uma tarefa |
+| `GET` | `/tasks` | Retrieve the authenticated user's tasks |
+| `GET` | `/tasks?type=Daily` | Filter tasks by daily type |
+| `GET` | `/tasks?type=LongTerm` | Filter tasks by long-term type |
+| `GET` | `/tasks/{id}` | Retrieve a specific task |
+| `POST` | `/tasks` | Create a task |
+| `PUT` | `/tasks/{id}` | Update task information |
+| `PATCH` | `/tasks/{id}/complete` | Mark a task as completed |
+| `DELETE` | `/tasks/{id}` | Delete a task |
 
----
+## Security
 
-## ⚙️ Como rodar localmente
+- JWT-based authentication
+- Password hashing using ASP.NET Core Identity's `PasswordHasher<T>`
+- Protected task endpoints
+- User-specific task access enforced through `UserId`
+- Unique email addresses for user registration
 
-### Pré-requisitos
-- [.NET SDK 9](https://dotnet.microsoft.com/download)
-- PostgreSQL instalado (local ou via Docker)
+Task ownership must be enforced by the application when retrieving, updating, or deleting resources to prevent unauthorized cross-user access.
 
-### Passos
+## Getting Started
+
+### Prerequisites
+
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [PostgreSQL](https://www.postgresql.org/download/)
+- [Git](https://git-scm.com/)
+
+### 1. Clone the repository
+
+Replace `YOUR_USERNAME` with the appropriate GitHub username if the repository URL differs.
 
 ```bash
-# clonar o repositório
-git clone https://github.com/SEU-USUARIO/TarefasApi.git
+git clone https://github.com/erickthmdev/TarefasApi.git
 cd TarefasApi
-
-# restaurar dependências
-dotnet restore
-
-# criar o banco
-psql -U postgres -c "CREATE DATABASE tarefasdb;"
-
-# configurar appsettings.json (ver seção abaixo)
-
-# aplicar as migrations
-dotnet ef database update
-
-# rodar a aplicação
-dotnet run
 ```
 
-Acesse a documentação interativa em `https://localhost:{porta}/swagger`.
+### 2. Configure the database
 
----
+Create a PostgreSQL database:
 
-## 🔐 Configuração
+```sql
+CREATE DATABASE tarefasdb;
+```
 
-No `appsettings.json` (em produção, prefira variáveis de ambiente ou secrets):
+Alternatively, create it using the PostgreSQL command-line client:
+
+```bash
+psql -U postgres -c "CREATE DATABASE tarefasdb;"
+```
+
+### 3. Configure application settings
+
+Configure the database connection string and JWT settings in `appsettings.json`:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=tarefasdb;Username=postgres;Password=SUA_SENHA"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=tarefasdb;Username=postgres;Password=YOUR_PASSWORD"
   },
   "Jwt": {
-    "Key": "sua-chave-secreta-com-no-minimo-32-caracteres",
+    "Key": "YOUR_SECRET_KEY_WITH_AT_LEAST_32_CHARACTERS",
     "Issuer": "TarefasApi",
     "Audience": "TarefasApiUsers",
     "ExpiresInMinutes": 120
@@ -129,27 +157,54 @@ No `appsettings.json` (em produção, prefira variáveis de ambiente ou secrets)
 }
 ```
 
----
+Use values compatible with the application's configuration classes. Never commit real database passwords or JWT signing keys to version control. For production deployments, use environment variables or a dedicated secrets manager.
 
-## 🧠 Regras de negócio
+### 4. Restore dependencies
 
-- Toda tarefa pertence a um único usuário
-- Tarefas são classificadas por `Type`: `Daily` (do dia) ou `LongTerm` (longo prazo)
-- Isolamento total entre usuários — ninguém acessa tarefa de outra conta
-- E-mail único no sistema, sem duplicidade de cadastro
+```bash
+dotnet restore
+```
 
----
+### 5. Apply database migrations
 
-## 🗺️ Roadmap
+If the EF Core migrations are included in the repository, run:
 
-- [ ] Refresh tokens
-- [ ] Testes automatizados (unitários e de integração)
-- [ ] Paginação nas listagens
-- [ ] Notificações de tarefas próximas do vencimento
-- [ ] Containerização com Docker
+```bash
+dotnet ef database update
+```
 
----
+Ensure that the Entity Framework Core CLI is installed and compatible with the project's package versions.
 
-## 📄 Licença
+### 6. Run the application
 
-Este projeto está sob a licença MIT.
+```bash
+dotnet run
+```
+
+The application will display its listening addresses in the terminal. If Swagger is enabled, open `/swagger` on the appropriate application URL to explore the available endpoints.
+
+## Business Rules
+
+- Each task belongs to a single user.
+- Tasks are classified as `Daily` or `LongTerm`.
+- Users must only be able to access and manage their own tasks.
+- Email addresses must be unique across registered users.
+- Protected endpoints require valid authentication.
+
+## Roadmap
+
+- [ ] Refresh token support
+- [ ] Unit and integration tests
+- [ ] Pagination for task listings
+- [ ] Notifications for upcoming task deadlines
+- [ ] Docker containerization
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Author
+
+**Erick** — Back-end Developer
+
+- GitHub: [@erickthmdev](https://github.com/erickthmdev)
